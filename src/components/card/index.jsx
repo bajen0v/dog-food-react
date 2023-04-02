@@ -1,5 +1,8 @@
+import cn from 'classnames';
+
 import "./styles.css";
-import likeIcon from "../../images/save.svg";
+import { ReactComponent as LikeIcon } from "../../images/save.svg";
+import { calcDiscountPrice, isLiked } from '../../utils/products';
 
 export function Card({
   name,
@@ -7,10 +10,22 @@ export function Card({
   discount,
   wight,
   description,
-  picture,
+  pictures,
+  tags,
+  likes,
+  onProductLike,
+  _id,
+  currentUser,
   ...props
 }) {
-  const discount_price = Math.round(price - (price * discount) / 100);
+  const discount_price = calcDiscountPrice(price, discount)
+
+  const like = isLiked(likes, currentUser?._id)
+
+
+  function handleClickButtonLike() {
+    onProductLike({ likes, _id })
+  }
 
   return (
     <article className="card">
@@ -18,14 +33,22 @@ export function Card({
         {discount !== 0 && (
           <span className="card__discount">{`-${discount}%`}</span>
         )}
+        {tags && tags.map(tagName => (
+          <span key={tagName} className={cn('tag', { [`tag_type_${tagName}`]: true })}>
+            {tagName}
+          </span>
+        )
+        )}
       </div>
       <div className="card__sticky card__sticky_type_top-right">
-        <button className="card__favorite">
-          <img src={likeIcon} alt="" className="card__favorite-icon" />
+        <button className={cn('card__favorite', { 'card__favorite_is-active': like })} onClick={handleClickButtonLike}>
+          <LikeIcon className="card__favorite-icon" />
+          {/* <img src={likeIcon} alt="" className="card__favorite-icon" /> */}
         </button>
       </div>
-      <a href="/#" className="card__link">
-        <img src={picture} alt={name} className="card__image" />
+
+      <a href="#" className="card__link">
+        <img src={pictures} alt={name} className="card__image" />
         <div className="card__desc">
           {discount !== 0 ? (
             <>
@@ -41,7 +64,7 @@ export function Card({
           <h3 className="card__name">{name}</h3>
         </div>
       </a>
-      <a href="/#" className="card__cart btn btn_type_primary">
+      <a href="#" className="card__cart btn btn_type_primary">
         В корзину
       </a>
     </article>

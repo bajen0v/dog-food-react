@@ -5,9 +5,11 @@
 *::before {
   box-sizing: inherit;
 }
+
 html {
   box-sizing: border-box;
 }
+
 body {
   font-family: "Nunito", "Arial", "Helvetica", sans-serif;
 }
@@ -30,4 +32,8 @@ img {
 
 .content__sort {
   margin-bottom: 40px;
+}
+
+.result {
+  font-size: 40px;
 }
