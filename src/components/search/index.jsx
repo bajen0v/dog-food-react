@@ -1,36 +1,56 @@
-import "./styles.css";
+import cn from 'classnames';
+import s from './styles.module.css';
 
-import { ReactComponent as CloseIcon } from "./assets/ic-close-input.svg";
-import { ReactComponent as SeachIcon } from "./assets/ic-search.svg";
+import { ReactComponent as CloseIcon } from './assets/ic-close-input.svg';
+import { ReactComponent as SearchIcon } from './assets/ic-search.svg';
+import { useState } from 'react';
 
+const optionBtn = {
+	open: cn([s['search__btn']]),
+	active_input: ` ${s['search__input-active']}`,
+	close: cn([s['search__btn']], [s['search__btn-hidden']])
+};
 
-export function Search({ handleFormSubmit, handleInputChange }) {
+export function Search({ handleFormSubmit }) {
+	const [inputActive, setInputActive] = useState(true);
+	const [searchQuery, setSearchQuery] = useState('');
 
-  function handleSearch(e) {
-    if(e.target.tagName !== 'INPUT'){
-      e.target.parentElement.parentElement.parentElement[0].className = 'search__input'
-      e.target.parentElement.parentElement.parentElement[1].className = 'search__btn search__btn-hidden'
-    } else {
-      e.target.parentElement[1].className = 'search__btn'
-      e.target.parentElement[0].className += ' search__input-active'
-    }
-  }
+	function handleInputChange(e) {
+		e.preventDefault();
+		setSearchQuery(e.target.value);
+		handleFormSubmit(searchQuery);
+	}
 
-  return (
-    <form className="search" onSubmit={handleFormSubmit} onClick={handleSearch}>
-      <input
-        type="text"
-        className="search__input"
-        onChange={(e) => {
-          handleInputChange(e.target.value);
-        }}
+	function handleBtnSubmit(e){
+		e.preventDefault();
+		setInputActive(!inputActive)
+	}
 
-        placeholder="Поиск"
-      />
-      <button className="search__btn search__btn-hidden">
-        <SeachIcon />
-        <CloseIcon />
-      </button>
-    </form>
-  );
+	return (
+		<form className={s.search} onSubmit={handleFormSubmit}>
+			<input
+				type='text'
+				onBlur={() => setInputActive(!inputActive)}
+				onClick={() => inputActive && setInputActive(!inputActive)}
+				className={
+					inputActive
+						? cn([s['search__input-active']], [s['search__input']])
+						: cn([s['search__input']])
+				}
+				onChange={e => {
+					handleInputChange(e);
+				}}
+				placeholder='Поиск'
+			/>
+			<button
+				// className={inputActive ? optionBtn.close : optionBtn.open}
+				className={optionBtn.open}
+				onClick={handleBtnSubmit}
+			>
+				{inputActive ? <SearchIcon /> : <CloseIcon />}
+
+				
+			</button>
+		</form>
+	);
 }

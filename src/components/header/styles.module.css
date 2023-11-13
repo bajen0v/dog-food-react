@@ -8,8 +8,65 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 80px;
+  gap: 25px;
 }
+
+.error {
+  position: absolute;
+  text-align: center;
+}
+
+.error svg {
+  top: 0;
+  right: 0;
+  position: absolute;
+}
+
+.error svg:hover {
+  cursor: pointer;
+  fill: #FEBA0C;
+}
+
+.hidden {
+  transition: 1s;
+  display: none;
+}
+
+.formAuth {
+  margin: 0 auto;
+  max-width: 250px;
+  display: flex;
+  flex-direction: row;
+  /* flex-wrap: wrap; */
+  /* justify-content: space-around; */
+  align-items: center;
+  box-sizing: content-box;
+}
+
+.formAuth * {
+  outline: 1px solid black;
+  /* overflow: hidden; */
+
+}
+
+.formAuth input {
+  border-radius: 7px;
+  border: none;
+  padding: 5px;
+  outline: none;
+}
+
+.formAuth div {
+  margin: 15px;
+}
+
+.formAuth div:last-child {
+  display: flex;
+  flex-direction: row;
+  
+}
+
+
 
 @media (max-width: 700px) {
   .wrapper {

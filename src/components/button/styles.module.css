@@ -29,3 +29,7 @@
 .button_type_secondary:hover {
     border-color: #7B8E98;
 }
+
+.button_type_header:hover {
+    border-color: #aeb6b9;
+}

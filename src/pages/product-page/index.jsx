@@ -1,5 +1,4 @@
-import { useEffect, useState } from 'react';
-import { CardList } from '../../components/card-list'
+import { useContext, useEffect, useState } from 'react';
 import Product from '../../components/product';
 import { Sort } from '../../components/sort'
 import { Spinner } from '../../components/spinner';
@@ -7,31 +6,37 @@ import api from '../../utils/api';
 import { isLiked } from '../../utils/products';
 
 import s from './styles.module.css';
+import { useParams } from 'react-router-dom';
+import { NotFoundPage } from '../not-found';
+import { CardListContext } from '../../contexts/card-list-context';
 
-const ID_PRODUCT = '622c77e877d63f6e70967d22';
 
 export const ProductPage = () => {
+    const { productId } = useParams()
+
     const [product, setProduct] = useState(null);
     const [currentUser, setCurrentUser] = useState(null);
     const [isLoading, setIsLoading] = useState(false)
+    const [error, setError] = useState(null)
+
+    const { onProductLike: handleLike } = useContext(CardListContext)
 
     function handleProductLike(product) {
-        const like = isLiked(product.likes, currentUser._id)
-        api.changeLikeProductStatus(product._id, like)
-            .then((updateCard) => {
-                setProduct(updateCard)
-            })
+        handleLike(product)
+            .then(updateCard => setProduct(updateCard))
     }
 
     useEffect(() => {
         setIsLoading(true);
-        api.getInfoProduct(ID_PRODUCT)
+        api.getInfoProduct(productId)
             .then(([productData, userData]) => {
                 setCurrentUser(userData);
                 setProduct(productData);
+                setError(null)
             })
-            .catch(() => {
-                console.log('Ошибка на стороне сервера');
+            .catch((err) => {
+                setError(err.message)
+                console.log(err.message);
             })
             .finally(() => {
                 setIsLoading(false);
@@ -41,8 +46,10 @@ export const ProductPage = () => {
         <>
             {isLoading
                 ? <Spinner />
-                : <Product {...product} currentUser={currentUser} onProductLike={handleProductLike} />
+                : !error && <Product {...product} currentUser={currentUser} onProductLike={handleProductLike} />
             }
+
+            {!isLoading && error && <NotFoundPage title='Товар не найден'/>}
         </>
     )
 }

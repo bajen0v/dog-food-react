@@ -162,6 +162,7 @@
 }
 
 .favorite {
+    cursor: pointer;
     background-color: transparent;
     border: none;
     display: flex;
@@ -170,8 +171,13 @@
     margin-bottom: 20px;
 }
 
+
 .favorite svg {
     fill: #FFFFFF;
+}
+
+.favorite svg:hover {
+    stroke: #7b8e98;
 }
 
 .favorite svg path:first-child {
@@ -185,6 +191,11 @@
 .favoriteActive svg path:first-child {
     fill: #F44336;
 }
+
+.favoriteActive svg:hover {
+    stroke: #fe1100;
+}
+
 
 
 @media (max-width: 1000px) {

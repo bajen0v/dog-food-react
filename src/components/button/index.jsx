@@ -1,6 +1,7 @@
 import cn from 'classnames';
 
 import s from './styles.module.css';
+
 export const Button = ({ type, children, href, extraClass, htmlType = 'button', action }) => {
 
     function handleClick(e) {

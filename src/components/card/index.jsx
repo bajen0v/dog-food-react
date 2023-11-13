@@ -1,8 +1,14 @@
-import cn from 'classnames';
+import { useContext } from 'react';
+import { Link } from 'react-router-dom';
 
-import "./styles.css";
+import { CardListContext } from "../../contexts/card-list-context";
+import { UserContext } from '../../contexts/current-user-context';
 import { ReactComponent as LikeIcon } from "../../images/save.svg";
 import { calcDiscountPrice, isLiked } from '../../utils/products';
+
+import cn from 'classnames';
+import "./styles.css";
+
 
 export function Card({
   name,
@@ -13,11 +19,12 @@ export function Card({
   pictures,
   tags,
   likes,
-  onProductLike,
   _id,
-  currentUser,
-  ...props
 }) {
+
+  const { user: currentUser } = useContext(UserContext)
+  const { onProductLike } = useContext(CardListContext)
+
   const discount_price = calcDiscountPrice(price, discount)
 
   const like = isLiked(likes, currentUser?._id)
@@ -43,12 +50,11 @@ export function Card({
       <div className="card__sticky card__sticky_type_top-right">
         <button className={cn('card__favorite', { 'card__favorite_is-active': like })} onClick={handleClickButtonLike}>
           <LikeIcon className="card__favorite-icon" />
-          {/* <img src={likeIcon} alt="" className="card__favorite-icon" /> */}
         </button>
       </div>
 
-      <a href="#" className="card__link">
-        <img src={pictures} alt={name} className="card__image" />
+      <Link to={`/product/${_id}`} className="card__link">
+       <img src={pictures} alt={name} className="card__image" />
         <div className="card__desc">
           {discount !== 0 ? (
             <>
@@ -63,7 +69,7 @@ export function Card({
           <span className="card__wight">{wight}</span>
           <h3 className="card__name">{name}</h3>
         </div>
-      </a>
+      </Link>
       <a href="#" className="card__cart btn btn_type_primary">
         В корзину
       </a>

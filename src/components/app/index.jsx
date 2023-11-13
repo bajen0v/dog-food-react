@@ -1,100 +1,114 @@
-import { useState, useEffect } from "react";
-import { CardList } from "../card-list";
-import { Footer } from "../footer";
-import { Header } from "../header";
-import { Sort } from "../sort";
-import { Logo } from "../logo";
-import { Search } from "../search";
-import { dataCard } from "../../data";
-import s from "./styles.module.css";
-import { Button } from '../button';
-// import styled from 'styled-components';
+import { useState, useEffect } from 'react';
+import { Footer } from '../footer';
+import { Header } from '../header';
+import { Sort } from '../sort';
+import { Logo } from '../logo';
+import { Search } from '../search';
+import { UserContext } from '../../contexts/current-user-context';
 import api from '../../utils/api';
 import { useDebounce } from '../../hooks/useDebounce';
 import { isLiked } from '../../utils/products';
 import { CatalogPage } from '../../pages/catalog-page';
 import { ProductPage } from '../../pages/product-page';
 import FaqPage from '../../pages/faq-page';
+import { Route, Routes } from 'react-router-dom';
+import { NotFoundPage } from '../../pages/not-found';
+import { CardListContext } from '../../contexts/card-list-context';
+import { ThemeContext } from '../../contexts/theme-context';
 
 export function App() {
-  const [cards, setCards] = useState([]);
-  const [currentUser, setCurrentUser] = useState(null);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [isLoading, setIsLoading] = useState(false)
+	const [cards, setCards] = useState([]);
+	const [currentUser, setCurrentUser] = useState(null);
+	const [searchQuery, setSearchQuery] = useState('');
+	const [isLoading, setIsLoading] = useState(false);
+	const [error, setError] = useState();
 
-  const debounceSearchQuery = useDebounce(searchQuery, 300);
+	const debounceSearchQuery = useDebounce(searchQuery, 300);
 
-  function handleRequest() {
-    // const filterCards = dataCard.filter((item) =>
-    //   item.name.includes(searchQuery)
-    // );
-    // setCards(filterCards);
+	function handleFormSubmit(dataInput) {
+		setSearchQuery(dataInput);
+	}
 
-    api.search(debounceSearchQuery)
-      .then((dataSearch) => {
-        setCards(dataSearch);
-        // console.log(data);
-      })
-  }
+	function handleUpdateUser(dataUserUpdate) {
+		api
+			.setUserInfo(dataUserUpdate)
+			.then(updateUserFromServer => {
+				setCurrentUser(updateUserFromServer);
+			})
+			.catch(err => {
+				setError(err);
+				console.log(err);
+			});
+	}
 
-  function handleFormSubmit(e) {
-    e.preventDefault();
-    handleRequest();
-  }
+	function handleProductLike(product) {
+		const like = isLiked(product.likes, currentUser._id);
 
-  function handleInputChange(dataInput) {
-    setSearchQuery(dataInput);
-  }
+		return api.changeLikeProductStatus(product._id, like)
+			.then(updateCard => {
+				const newProducts = cards.map(cardState => {
+				return cardState._id === updateCard._id ? updateCard : cardState;
+				});
+				setCards(newProducts);
+				return updateCard;
+			});
+	}
 
-  function handleUpdateUser(dataUserUpdate) {
-    api.setUserInfo(dataUserUpdate)
-      .then((updateUserFromServer) => {
-        setCurrentUser(updateUserFromServer)
-      })
-  }
+	useEffect(() => {
+		api.search(debounceSearchQuery).then(dataSearch => {
+			setCards(dataSearch);
+		});
+	}, [debounceSearchQuery]);
 
-  function handleProductLike(product) {
-    const like = isLiked(product.likes, currentUser._id)
-    api.changeLikeProductStatus(product._id, like)
-      .then((updateCard) => {
-        const newProducts = cards.map(cardState => {
-          return cardState._id === updateCard._id ? updateCard : cardState
-        })
-        setCards(newProducts)
-      })
-  }
+	useEffect(() => {
+		setIsLoading(true);
+		api
+			.getAllInfo()
+			.then(([productsData, userInfoData]) => {
+				setCurrentUser(userInfoData);
+				setCards(productsData.products);
+			})
+			.catch(err => console.log(err))
+			.finally(() => {
+				setIsLoading(false);
+			});
+		}, []);
+		
+		return (
+			<>
+			<ThemeContext.Provider>
+			<CardListContext.Provider
+				value={{
+					cards,
+					onProductLike: handleProductLike,
+					isLoading: isLoading
+				}}
+			>
+				<UserContext.Provider
+					value={{ user: currentUser, error, onUpdateUser: handleUpdateUser }}
+				>
+					<Header>
+						<Logo />
+						<Routes>
+							<Route
+								path='/'
+								element={<Search handleFormSubmit={handleFormSubmit} />}
+							/>
+						</Routes>
+					</Header>
+					<main className='content container'>
+						<Routes>
+							<Route path='/' element={<CatalogPage />} />
+							<Route path='/faq' element={<FaqPage />} />
+							<Route path="/product/:productId" element={<ProductPage />} />
+							<Route path='*' element={<NotFoundPage />} />
+						</Routes>
+					</main>
 
-  useEffect(() => {
-    handleRequest();
-  }, [debounceSearchQuery]);
-
-
-  useEffect(() => {
-    setIsLoading(true)
-    api.getAllInfo()
-      .then(([productsData, userInfoData]) => {
-        setCurrentUser(userInfoData);
-        setCards(productsData.products);
-      })
-      .catch(err => console.log(err))
-      .finally(() => { setIsLoading(false) })
-  }, [])
-
-  return (
-    <>
-      <Header user={currentUser} onUpdateUser={handleUpdateUser}>
-        <Logo />
-        <Search
-          handleFormSubmit={handleFormSubmit}
-          handleInputChange={handleInputChange}
-        />
-      </Header>
-      <main className="content container">
-        {/* <FaqPage />
-        <ProductPage /> */}
-        <CatalogPage cards={cards} handleProductLike={handleProductLike} currentUser={currentUser} isLoading={isLoading} />
-      </main>
-      <Footer />
-    </>
-  );
+					<Footer />
+				</UserContext.Provider>
+			</CardListContext.Provider>
+			</ThemeContext.Provider>
+		</>
+	);
 }
