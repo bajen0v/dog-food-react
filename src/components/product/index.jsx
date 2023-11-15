@@ -8,6 +8,9 @@ import quality from '../../images/quality.svg';
 
 import s from './styles.module.css';
 import { Link } from 'react-router-dom';
+import { UserContext } from '../../contexts/current-user-context';
+import { useContext } from 'react';
+
 
 function Product({
 	onProductLike,
@@ -18,9 +21,11 @@ function Product({
 	discount,
 	price,
 	likes,
-	currentUser,
 	reviews
 	}) {
+	
+	const { user: currentUser } = useContext(UserContext)
+
 	const discount_price = calcDiscountPrice(price, discount);
 	const like = isLiked(likes, currentUser?._id);
 

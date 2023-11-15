@@ -4,6 +4,53 @@
   padding: 12px 0;
 }
 
+.header_black {
+  width: 100%;
+  background-color: #000000;
+  padding: 12px 0;
+  color: #ffffff;
+
+}
+
+.themeContainer{
+  position: absolute;
+  /* padding: 2px; */
+  top: 25px;
+  right: 70px;
+  width: 55px;
+  height: 27px;
+  background-color: black;
+  border-radius: 15px;
+  cursor: pointer;
+  transition: .5s;
+
+}
+
+.themeContainer_white {
+  background-color: #ffffff;
+}
+
+.circle {
+  position: absolute;
+  top: 1px;
+  /* margin: 2px; */
+  width: 25px;
+  height: 25px;
+  border-radius: 25px;
+}
+
+.circle_white {
+  background-color: #ffffff;
+  transform: translateX(1px);
+  transition: .5s;
+
+}
+.circle_dark {
+  background-color: black;
+  transform: translateX(29px);
+  transition: .5s;
+}
+
 .wrapper {
   display: flex;
   align-items: center;
@@ -14,6 +61,10 @@
 .error {
   position: absolute;
   text-align: center;
+}
+
+.error_black{
+  background-color: #000000;
 }
 
 .error svg {
@@ -34,19 +85,7 @@
 
 .formAuth {
   margin: 0 auto;
-  max-width: 250px;
   display: flex;
-  flex-direction: row;
-  /* flex-wrap: wrap; */
-  /* justify-content: space-around; */
-  align-items: center;
-  box-sizing: content-box;
-}
-
-.formAuth * {
-  outline: 1px solid black;
-  /* overflow: hidden; */
-
 }
 
 .formAuth input {
@@ -57,15 +96,15 @@
 }
 
 .formAuth div {
-  margin: 15px;
-}
-
-.formAuth div:last-child {
   display: flex;
-  flex-direction: row;
-  
+  gap: 5px;
+  flex-direction: column;
+  justify-content: space-around;
+  width: 100%;
+  align-items: flex-end;
+  height: 56px;
+  margin-right: 5px;
 }
-
 
 
 @media (max-width: 700px) {

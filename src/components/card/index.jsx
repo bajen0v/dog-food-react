@@ -1,4 +1,4 @@
-import { useContext } from 'react';
+import { useContext, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 
 import { CardListContext } from "../../contexts/card-list-context";
@@ -23,7 +23,7 @@ export function Card({
 }) {
 
   const { user: currentUser } = useContext(UserContext)
-  const { onProductLike } = useContext(CardListContext)
+  const { onProductLike, favorites} = useContext(CardListContext)
 
   const discount_price = calcDiscountPrice(price, discount)
 

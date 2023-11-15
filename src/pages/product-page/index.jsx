@@ -9,44 +9,26 @@ import s from './styles.module.css';
 import { useParams } from 'react-router-dom';
 import { NotFoundPage } from '../not-found';
 import { CardListContext } from '../../contexts/card-list-context';
+import { useApi } from '../../hooks';
 
 
 export const ProductPage = () => {
     const { productId } = useParams()
 
-    const [product, setProduct] = useState(null);
-    const [currentUser, setCurrentUser] = useState(null);
-    const [isLoading, setIsLoading] = useState(false)
-    const [error, setError] = useState(null)
-
+    const handleGetProduct = () => api.getProductById(productId)
+    const {data:product , error, loading:isLoading, setData} = useApi(handleGetProduct, productId)
     const { onProductLike: handleLike } = useContext(CardListContext)
 
     function handleProductLike(product) {
         handleLike(product)
-            .then(updateCard => setProduct(updateCard))
+            .then(updateCard => setData(updateCard))
     }
 
-    useEffect(() => {
-        setIsLoading(true);
-        api.getInfoProduct(productId)
-            .then(([productData, userData]) => {
-                setCurrentUser(userData);
-                setProduct(productData);
-                setError(null)
-            })
-            .catch((err) => {
-                setError(err.message)
-                console.log(err.message);
-            })
-            .finally(() => {
-                setIsLoading(false);
-            })
-    }, [])
     return (
         <>
             {isLoading
                 ? <Spinner />
-                : !error && <Product {...product} currentUser={currentUser} onProductLike={handleProductLike} />
+                : !error && <Product {...product} onProductLike={handleProductLike} />
             }
 
             {!isLoading && error && <NotFoundPage title='Товар не найден'/>}

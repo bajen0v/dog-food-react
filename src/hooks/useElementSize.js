@@ -2,7 +2,7 @@ import { useCallback, useState } from 'react'
 import { useEventListener, useIsomorphicLayoutEffect } from './index.js'
 
 
-function useElementSize() {
+export function useElementSize() {
 
     const [ref, setRef] = useState(null)
     const [size, setSize] = useState({
@@ -26,5 +26,3 @@ function useElementSize() {
 
     return [setRef, size]
 }
-
-export default useElementSize

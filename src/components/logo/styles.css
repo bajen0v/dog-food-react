@@ -6,3 +6,12 @@
 .logo {
     flex-shrink: 0;
 }
+
+
+.white *{
+    fill: #FFFFFF;
+}
+
+.black *{
+    fill: black;
+}

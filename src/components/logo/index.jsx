@@ -1,11 +1,10 @@
 import "./styles.css";
-import logoSrc from './assets/logo.svg';
+import {ReactComponent as LogoImg} from './assets/logo.svg';
 
-
-export function Logo({ className }) {
+export function Logo({ className='' }) {
   return (
-    <a href="/" className={`${className} logo`}>
-      <img src={logoSrc} alt="Логотип компании" className="logo__pic" />
+    <a href="/" className="logo">
+      <LogoImg alt="Логотип компании" className={`logo__pic ${className}`} />
     </a>
   );
 }

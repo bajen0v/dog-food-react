@@ -1,10 +1,7 @@
-import { useContext } from "react";
 import { Card } from "../card";
 import "./styles.css";
-import { CardListContext } from "../../contexts/card-list-context";
 
-export function CardList() {
-  const { cards } = useContext(CardListContext)
+export function CardList({cards}) {
 
   return (
     <div className="cards content__cards">

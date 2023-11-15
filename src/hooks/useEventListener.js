@@ -2,7 +2,7 @@ import { useEffect, useRef } from 'react'
 import { useIsomorphicLayoutEffect } from './index.js'
 
 
-function useEventListener(
+export function useEventListener(
     eventName,
     handler,
     element,
@@ -29,4 +29,3 @@ function useEventListener(
     }, [eventName, element, options])
 }
 
-export default useEventListener

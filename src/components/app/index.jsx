@@ -1,27 +1,39 @@
 import { useState, useEffect } from 'react';
-import { Footer } from '../footer';
-import { Header } from '../header';
-import { Sort } from '../sort';
-import { Logo } from '../logo';
-import { Search } from '../search';
-import { UserContext } from '../../contexts/current-user-context';
+import { Route, Routes } from 'react-router-dom';
+
 import api from '../../utils/api';
-import { useDebounce } from '../../hooks/useDebounce';
-import { isLiked } from '../../utils/products';
+import { Header } from '../header';
+import { Search } from '../search';
+import { Logo } from '../logo';
+import { Footer } from '../footer';
+import { Sort } from '../sort';
 import { CatalogPage } from '../../pages/catalog-page';
 import { ProductPage } from '../../pages/product-page';
 import FaqPage from '../../pages/faq-page';
-import { Route, Routes } from 'react-router-dom';
 import { NotFoundPage } from '../../pages/not-found';
+import { useDebounce } from '../../hooks/useDebounce';
+import { isLiked } from '../../utils/products';
+
+import { UserContext } from '../../contexts/current-user-context';
 import { CardListContext } from '../../contexts/card-list-context';
-import { ThemeContext } from '../../contexts/theme-context';
+
+import s from './styles.module.css'
+import { FavoritesPage } from '../../pages/favorite-page';
+
+const colorTheme = {
+	white: 'white',
+	black: 'black'
+}
 
 export function App() {
 	const [cards, setCards] = useState([]);
+	const [favorites, setFavorites] = useState([])
 	const [currentUser, setCurrentUser] = useState(null);
 	const [searchQuery, setSearchQuery] = useState('');
 	const [isLoading, setIsLoading] = useState(false);
 	const [error, setError] = useState();
+	const [theme, setTheme] = useState(false);
+
 
 	const debounceSearchQuery = useDebounce(searchQuery, 300);
 
@@ -50,8 +62,18 @@ export function App() {
 				return cardState._id === updateCard._id ? updateCard : cardState;
 				});
 				setCards(newProducts);
+
+				if(!like) {
+					setFavorites(prevState => [...prevState, updateCard])
+				} else {
+					setFavorites(prevState => prevState.filter(card => card._id !== updateCard._id))
+				}
 				return updateCard;
 			});
+	}
+
+	function handleTheme() {
+		setTheme(!theme)
 	}
 
 	useEffect(() => {
@@ -67,6 +89,9 @@ export function App() {
 			.then(([productsData, userInfoData]) => {
 				setCurrentUser(userInfoData);
 				setCards(productsData.products);
+
+				const favorites = productsData.products.filter(product => isLiked(product.likes, userInfoData._id))
+				setFavorites(favorites)
 			})
 			.catch(err => console.log(err))
 			.finally(() => {
@@ -76,10 +101,11 @@ export function App() {
 		
 		return (
 			<>
-			<ThemeContext.Provider>
+			{/* <ThemeContext.Provider value={ThemeContext}> */}
 			<CardListContext.Provider
 				value={{
 					cards,
+					favorites,
 					onProductLike: handleProductLike,
 					isLoading: isLoading
 				}}
@@ -87,8 +113,8 @@ export function App() {
 				<UserContext.Provider
 					value={{ user: currentUser, error, onUpdateUser: handleUpdateUser }}
 				>
-					<Header>
-						<Logo />
+					<Header handleTheme={handleTheme} theme={theme}>
+						<Logo className={theme ? colorTheme.white : colorTheme.black}/>
 						<Routes>
 							<Route
 								path='/'
@@ -99,8 +125,9 @@ export function App() {
 					<main className='content container'>
 						<Routes>
 							<Route path='/' element={<CatalogPage />} />
+							<Route path='/favorites' element={<FavoritesPage />} />
 							<Route path='/faq' element={<FaqPage />} />
-							<Route path="/product/:productId" element={<ProductPage />} />
+							<Route path='/product/:productId' element={<ProductPage />} />
 							<Route path='*' element={<NotFoundPage />} />
 						</Routes>
 					</main>
@@ -108,7 +135,7 @@ export function App() {
 					<Footer />
 				</UserContext.Provider>
 			</CardListContext.Provider>
-			</ThemeContext.Provider>
+			{/* </ThemeContext.Provider> */}
 		</>
 	);
 }

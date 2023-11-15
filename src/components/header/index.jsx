@@ -6,10 +6,9 @@ import s from './styles.module.css';
 import { useContext, useEffect, useState } from 'react';
 import { UserContext } from '../../contexts/current-user-context';
 
-export function Header({ children }) {
-	const { user, error, onUpdateUser } = useContext(UserContext)
-	const [errorOpen, setErrorOpen] = useState(true);
-
+export function Header({ children, handleTheme, theme }) {
+	const { user, error, onUpdateUser } = useContext(UserContext);
+	const [errorOpen, setErrorOpen] = useState(false);
 
 	const handleClickButtonEdit = () => {
 		onUpdateUser({ name: 'Вася', about: 'Ментор' });
@@ -20,7 +19,7 @@ export function Header({ children }) {
 	}, [error]);
 
 	return (
-		<header className={s.header}>
+		<header className={theme ? s.header_black: s.header }>
 			<div className={cn('container', s.wrapper)}>
 				{children}
 				<span>
@@ -32,16 +31,15 @@ export function Header({ children }) {
 				</Button>
 			</div>
 			{errorOpen && (
-				<div className={cn('error', s.error, { [s.hidden]: !errorOpen })}>
+				<div className={cn('error', s.error, { [s.hidden]: errorOpen, [s.error_black]: theme})}>
 					<p>Авторизуйтесь</p>
 					<form className={s.formAuth} action='submit'>
 						<div>
 							<label htmlFor='name'>Имя</label>
 							<label htmlFor='password'>Пароль</label>
-
 						</div>
 						<div>
-						<input id='name' type='name' placeholder='Введите Имя' />
+							<input id='name' type='name' placeholder='Введите Имя' />
 							<input
 								id='password'
 								type='password'
@@ -52,6 +50,14 @@ export function Header({ children }) {
 					<CloseIcon onClick={() => setErrorOpen(!errorOpen)} />
 				</div>
 			)}
+			<div
+				className={cn(s.themeContainer, { [s.themeContainer_white]: theme })}
+				onClick={handleTheme}
+			>
+				<div
+					className={`${s.circle} ${theme ? s.circle_dark : s.circle_white}`}
+				></div>
+			</div>
 		</header>
 	);
 }
